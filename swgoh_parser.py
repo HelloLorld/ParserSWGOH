@@ -31,8 +31,12 @@ def getInfoAboutGuild(id=''):  # Запрос информации о гильд
 def getInfoAboutAllPlayers(allyCodes=[]):
     dictOfPlayers = {}
     for allyCode in allyCodes:
+        dictWithGalacticPowerAndUnits = {}
         jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
-        dictOfPlayers[jsonReqPlayer['data']['name']] = jsonReqPlayer['units']
+        dictWithGalacticPowerAndUnits['galactic_power'] = jsonReqPlayer['data']['galactic_power']
+        dictWithGalacticPowerAndUnits['units'] = jsonReqPlayer['units']
+        dictOfPlayers[jsonReqPlayer['data']['name']] = dictWithGalacticPowerAndUnits
+        break
     return dictOfPlayers
 
 
@@ -62,10 +66,13 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
                 allyCodes.append(member['ally_code'])
             dictOfPlayers = getInfoAboutAllPlayers(allyCodes=allyCodes)
         else:
+            dictWithGalacticPowerAndUnits = {}
+            dictWithGalacticPowerAndUnits['galactic_power'] = jsonPlayerInfo['data']['galactic_power']
+            dictWithGalacticPowerAndUnits['units'] = jsonPlayerInfo['units']
             dictOfPlayers[jsonPlayerInfo['data']
-                          ['name']] = jsonPlayerInfo['units']
+                          ['name']] = dictWithGalacticPowerAndUnits
         for key in dictOfPlayers.keys():
-            dictOfPlayers[key] = arrOfUnitsToDict(dictOfPlayers[key])
+            dictOfPlayers[key]['units'] = arrOfUnitsToDict(dictOfPlayers[key]['units'])
         print(dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
 
