@@ -36,7 +36,6 @@ def getInfoAboutAllPlayers(allyCodes=[]):
         dictWithGalacticPowerAndUnits['galactic_power'] = jsonReqPlayer['data']['galactic_power']
         dictWithGalacticPowerAndUnits['units'] = jsonReqPlayer['units']
         dictOfPlayers[jsonReqPlayer['data']['name']] = dictWithGalacticPowerAndUnits
-        break
     return dictOfPlayers
 
 
@@ -87,7 +86,7 @@ def main():
     # if (input().lower().find("y") != -1):
     #     needGuild = True
     try:
-        getInfoFromSWGOH(id=785425257, needGuild=True)
+        getInfoFromSWGOH(id=785425257, needGuild=False)
     except Exception as ex:
         print(ex)
 
