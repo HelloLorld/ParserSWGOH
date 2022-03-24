@@ -1,0 +1,1 @@
+# ParserSWGOH
