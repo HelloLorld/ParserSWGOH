@@ -13,7 +13,6 @@ def getJsonInfoOfPlayer(id=0):  # Запрос информации об игр�
         if req.status_code == 200:
             jsonReqPlayer = json.loads(req.text)
             return jsonReqPlayer
-        # print(jsonReq['units'])
     except requests.RequestException as e:
         print(e)
 
@@ -34,13 +33,22 @@ def getInfoAboutAllPlayers(allyCodes=[]):
     for allyCode in allyCodes:
         jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
         dictOfPlayers[jsonReqPlayer['data']['name']] = jsonReqPlayer['units']
-    for key, word in dictOfPlayers.items():
-        print(key + ' ' + str(word))
     return dictOfPlayers
 
 
 def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     pass
+
+
+def arrOfUnitsToDict(units=[]):  # Массив персонажей переделываем в словарь
+    dictOfUnits = {}
+    for unit in units:
+        gearLvl = unit['data']['gear_level']
+        if gearLvl != 13:
+            dictOfUnits[unit['data']['name']] = str(gearLvl)
+        else:
+            dictOfUnits[unit['data']['name']] = str(gearLvl) + ' + ' + str(unit['data']['relic_tier']-2)
+    return dictOfUnits
 
 
 def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная функция
@@ -56,6 +64,9 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
         else:
             dictOfPlayers[jsonPlayerInfo['data']
                           ['name']] = jsonPlayerInfo['units']
+        for key in dictOfPlayers.keys():
+            dictOfPlayers[key] = arrOfUnitsToDict(dictOfPlayers[key])
+        print(dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
 
     else:
