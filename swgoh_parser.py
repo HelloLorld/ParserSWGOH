@@ -2,11 +2,11 @@ import requests
 import json
 
 
-class NotFoundPlayer(Exception):
+class NotFoundPlayer(Exception):  # Исключение о том, что игрок не был найден
     pass
 
-#Запрос информации об игроке 
-def getJsonInfoOfPlayer(id=0):
+
+def getJsonInfoOfPlayer(id=0):  # Запрос информации об игроке
     try:
         req = requests.get('https://swgoh.gg/api/player/' + str(id))
         print(req.status_code)
@@ -17,8 +17,8 @@ def getJsonInfoOfPlayer(id=0):
     except requests.RequestException as e:
         print(e)
 
-# Запрос информации о гильдии
-def getInfoAboutGuild(id=''):
+
+def getInfoAboutGuild(id=''):  # Запрос информации о гильдии
     try:
         req = requests.get('https://swgoh.gg/api/guild-profile/' + id)
         if req.status_code == 200:
@@ -26,18 +26,24 @@ def getInfoAboutGuild(id=''):
             return jsonReqGuild['data']['members']
     except requests.RequestException as e:
         print(e)
+
+
 # Получение информации по всем игрокам из гильдии
 def getInfoAboutAllPlayers(allyCodes=[]):
-    dictOfPlayers={}
+    dictOfPlayers = {}
     for allyCode in allyCodes:
         jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
         dictOfPlayers[jsonReqPlayer['data']['name']] = jsonReqPlayer['units']
     for key, word in dictOfPlayers.items():
-        print(key +' ' + str(word))
+        print(key + ' ' + str(word))
     return dictOfPlayers
 
-# Основная функция
-def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):
+
+def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
+    pass
+
+
+def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная функция
     jsonPlayerInfo = getJsonInfoOfPlayer(id=id)
     if jsonPlayerInfo != None:
         dictOfPlayers = {}
@@ -48,8 +54,10 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):
                 allyCodes.append(member['ally_code'])
             dictOfPlayers = getInfoAboutAllPlayers(allyCodes=allyCodes)
         else:
-            dictOfPlayers[jsonPlayerInfo['data']['name']] = jsonPlayerInfo['units']
-            
+            dictOfPlayers[jsonPlayerInfo['data']
+                          ['name']] = jsonPlayerInfo['units']
+        writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
+
     else:
         raise NotFoundPlayer("Мы не смогли найти игрока")
 
