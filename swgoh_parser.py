@@ -5,7 +5,7 @@ import json
 class NotFoundPlayer(Exception):
     pass
 
-
+#Запрос информации об игроке 
 def getJsonInfoOfPlayer(id=0):
     try:
         req = requests.get('https://swgoh.gg/api/player/' + str(id))
@@ -17,7 +17,7 @@ def getJsonInfoOfPlayer(id=0):
     except requests.RequestException as e:
         print(e)
 
-
+# Запрос информации о гильдии
 def getInfoAboutGuild(id=''):
     try:
         req = requests.get('https://swgoh.gg/api/guild-profile/' + id)
@@ -26,15 +26,30 @@ def getInfoAboutGuild(id=''):
             return jsonReqGuild['data']['members']
     except requests.RequestException as e:
         print(e)
+# Получение информации по всем игрокам из гильдии
+def getInfoAboutAllPlayers(allyCodes=[]):
+    dictOfPlayers={}
+    for allyCode in allyCodes:
+        jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
+        dictOfPlayers[jsonReqPlayer['data']['name']] = jsonReqPlayer['units']
+    for key, word in dictOfPlayers.items():
+        print(key +' ' + str(word))
+    return dictOfPlayers
 
-
+# Основная функция
 def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):
     jsonPlayerInfo = getJsonInfoOfPlayer(id=id)
     if jsonPlayerInfo != None:
+        dictOfPlayers = {}
         if needGuild:
+            allyCodes = []
             members = getInfoAboutGuild(jsonPlayerInfo['data']['guild_id'])
             for member in members:
-                print(member['player_name'])
+                allyCodes.append(member['ally_code'])
+            dictOfPlayers = getInfoAboutAllPlayers(allyCodes=allyCodes)
+        else:
+            dictOfPlayers[jsonPlayerInfo['data']['name']] = jsonPlayerInfo['units']
+            
     else:
         raise NotFoundPlayer("Мы не смогли найти игрока")
 

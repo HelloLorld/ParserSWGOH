@@ -1,4 +1,3 @@
-from urllib import request
 from gui import *
 from swgoh_parser import getInfoFromSWGOH
 from swgoh_parser import NotFoundPlayer
