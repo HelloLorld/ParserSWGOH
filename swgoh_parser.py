@@ -1,5 +1,6 @@
 import requests
 import json
+import xlsxwriter
 
 
 class NotFoundPlayer(Exception):  # Исключение о том, что игрок не был найден
@@ -35,12 +36,32 @@ def getInfoAboutAllPlayers(allyCodes=[]):
         jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
         dictWithGalacticPowerAndUnits['galactic_power'] = jsonReqPlayer['data']['galactic_power']
         dictWithGalacticPowerAndUnits['units'] = jsonReqPlayer['units']
-        dictOfPlayers[jsonReqPlayer['data']['name']] = dictWithGalacticPowerAndUnits
+        dictOfPlayers[jsonReqPlayer['data']['name']
+                      ] = dictWithGalacticPowerAndUnits
     return dictOfPlayers
 
 
+# Записываем все данные в Excel
 def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
-    pass
+    # Create a workbook and add a worksheet.
+    workbook = xlsxwriter.Workbook('Units.xlsx')
+    worksheet = workbook.add_worksheet()
+    row = 0
+    col = 0
+
+    worksheet.write(row, col, '№')
+    worksheet.write(row, col + 1, 'Nickname')
+    worksheet.write(row, col + 2, 'Galactic power')
+
+    row += 1
+    for player in dictOfPlayers.keys():
+        worksheet.write(row, col,     player)
+        col += 1
+        for unit in dictOfPlayers[player]['units'].keys():
+            worksheet.write(row, col, unit)
+            col += 1
+        row += 1
+    workbook.close()
 
 
 def arrOfUnitsToDict(units=[]):  # Массив персонажей переделываем в словарь
@@ -71,10 +92,11 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
             dictOfPlayers[jsonPlayerInfo['data']
                           ['name']] = dictWithGalacticPowerAndUnits
         for key in dictOfPlayers.keys():
-            dictOfPlayers[key]['units'] = arrOfUnitsToDict(dictOfPlayers[key]['units'])
+            dictOfPlayers[key]['units'] = arrOfUnitsToDict(
+                dictOfPlayers[key]['units'])
         print(dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
-
+        return 0
     else:
         raise NotFoundPlayer("Мы не смогли найти игрока")
 

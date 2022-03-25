@@ -6,7 +6,9 @@ import sys
 
 def swCall():
     try:
-        getInfoFromSWGOH(id=ui.lineEdit.text(),needGuild=ui.checkBox.isChecked(), pathForSave=ui.lineEdit_2.text())
+        result = getInfoFromSWGOH(id=ui.lineEdit.text(),needGuild=ui.checkBox.isChecked(), pathForSave=ui.lineEdit_2.text())
+        if result == 0:
+            pass
     except NotFoundPlayer as notFound:
         print(notFound)
     except Exception as ex:
