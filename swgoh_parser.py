@@ -47,10 +47,10 @@ def arrOfUnitsToDict(units=[]):  # Массив персонажей перед�
     dictOfUnits = {}
     for unit in units:
         gearLvl = unit['data']['gear_level']
-        if gearLvl != 13:
-            dictOfUnits[unit['data']['name']] = str(gearLvl)
-        else:
-            dictOfUnits[unit['data']['name']] = str(gearLvl) + ' + ' + str(unit['data']['relic_tier']-2)
+        lvlOfUnit = {}
+        lvlOfUnit['gear_level'] = gearLvl
+        lvlOfUnit['relic_tier'] = unit['data']['relic_tier']-2
+        dictOfUnits[unit['data']['name']] = lvlOfUnit
     return dictOfUnits
 
 
