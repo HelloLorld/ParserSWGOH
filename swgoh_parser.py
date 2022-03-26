@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 import json
 import xlsxwriter
@@ -48,7 +49,7 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     unitsTuple = tuple(data.split('\n'))
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook('Units.xlsx')
+    workbook = xlsxwriter.Workbook('statistics_'+ datetime.now().strftime("%H_%M_%S")+ '.xlsx')
     worksheet = workbook.add_worksheet()
     row = 0
     col = 0
@@ -82,7 +83,11 @@ def getStringOfGearAndRelic(dictOfPlayers={}, player='', unit=''):
     if gearLvl == 13:
         return str(gearLvl) + '+' + str(dictOfPlayers[player]['units'][unit]['relic_tier'])
     else:
-        return str(gearLvl)
+        stars = dictOfPlayers[player]['units'][unit]['stars']
+        if stars == 7:
+            return str(gearLvl)
+        else:
+            return str(gearLvl) + '(' + str(stars) +'*)'
 
 
 def arrOfUnitsToDict(units=[]):  # Массив персонажей переделываем в словарь
@@ -92,6 +97,7 @@ def arrOfUnitsToDict(units=[]):  # Массив персонажей перед�
         lvlOfUnit = {}
         lvlOfUnit['gear_level'] = gearLvl
         lvlOfUnit['relic_tier'] = unit['data']['relic_tier']-2
+        lvlOfUnit['stars'] = unit['data']['rarity']
         dictOfUnits[unit['data']['name']] = lvlOfUnit
     return dictOfUnits
 
