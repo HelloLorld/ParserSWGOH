@@ -43,25 +43,46 @@ def getInfoAboutAllPlayers(allyCodes=[]):
 
 # Записываем все данные в Excel
 def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
+    f = open('config_units.txt', 'r', encoding='UTF-8')
+    data = f.read()
+    unitsTuple = tuple(data.split('\n'))
+    
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook('Units.xlsx')
     worksheet = workbook.add_worksheet()
     row = 0
     col = 0
 
-    worksheet.write(row, col, '№')
-    worksheet.write(row, col + 1, 'Nickname')
-    worksheet.write(row, col + 2, 'Galactic power')
-
-    row += 1
-    for player in dictOfPlayers.keys():
-        worksheet.write(row, col,     player)
+    worksheet.write(row, col, 'Nickname')
+    worksheet.write(row, col + 1, 'Galactic power')
+    col += 2
+    for unit in unitsTuple:
+        worksheet.write(row, col, unit)
         col += 1
-        for unit in dictOfPlayers[player]['units'].keys():
-            worksheet.write(row, col, unit)
+    
+    row += 1
+    col = 0
+    for player in dictOfPlayers.keys():
+        worksheet.write(row, col, player)
+        col += 1
+        worksheet.write(row, col, dictOfPlayers[player]['galactic_power'] ) 
+        col += 1
+        for unit in unitsTuple:
+            try:
+                worksheet.write(row, col, getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit))
+            except:
+                worksheet.write(row, col, 'Нет')
             col += 1
         row += 1
+        col=0
     workbook.close()
+
+def getStringOfGearAndRelic(dictOfPlayers={}, player='', unit=''):
+    gearLvl = dictOfPlayers[player]['units'][unit]['gear_level']
+    if gearLvl == 13:
+        return str(gearLvl) + '+' + str(dictOfPlayers[player]['units'][unit]['relic_tier'])
+    else:
+        return str(gearLvl)
 
 
 def arrOfUnitsToDict(units=[]):  # Массив персонажей переделываем в словарь
@@ -108,7 +129,7 @@ def main():
     # if (input().lower().find("y") != -1):
     #     needGuild = True
     try:
-        getInfoFromSWGOH(id=785425257, needGuild=False)
+        getInfoFromSWGOH(id=785425257, needGuild=True)
     except Exception as ex:
         print(ex)
 
