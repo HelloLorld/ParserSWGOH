@@ -9,14 +9,11 @@ class NotFoundPlayer(Exception):  # Исключение о том, что иг�
 
 
 def getJsonInfoOfPlayer(id=0):  # Запрос информации об игроке
-    try:
-        req = requests.get('https://swgoh.gg/api/player/' + str(id))
-        print(req.status_code)
-        if req.status_code == 200:
-            jsonReqPlayer = json.loads(req.text)
-            return jsonReqPlayer
-    except requests.RequestException as e:
-        print(e)
+    req = requests.get('https://swgoh.gg/api/player/' + str(id))
+    print(req.status_code)
+    if req.status_code == 200:
+        jsonReqPlayer = json.loads(req.text)
+        return jsonReqPlayer
 
 
 def getInfoAboutGuild(id=''):  # Запрос информации о гильдии
@@ -49,8 +46,43 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     unitsTuple = tuple(data.split('\n'))
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook('statistics_'+ datetime.now().strftime("%H_%M_%S")+ '.xlsx')
+    #workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%H_%M_%S")+ '.xlsx')
+    workbook = xlsxwriter.Workbook('Units.xlsx')
     worksheet = workbook.add_worksheet()
+    cell_format_yellow = workbook.add_format()
+    cell_format_yellow.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_yellow.set_bg_color('yellow')
+    cell_format_yellow.set_border(style=2)
+
+    cell_format_green = workbook.add_format()
+    cell_format_green.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_green.set_bg_color('#3caa3c')
+    cell_format_green.set_border(style=2)
+
+    cell_format_darkgreen = workbook.add_format()
+    cell_format_darkgreen.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_darkgreen.set_bg_color('#008000')
+    cell_format_darkgreen.set_border(style=2)
+
+    cell_format_pink = workbook.add_format()
+    cell_format_pink.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_pink.set_bg_color('#ffc0cb')
+    cell_format_pink.set_border(style=2)
+
+    cell_format_blue = workbook.add_format()
+    cell_format_blue.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_blue.set_bg_color('#42aaff')
+    cell_format_blue.set_border(style=2)
+
+    cell_format_lightgreen = workbook.add_format()
+    cell_format_lightgreen.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_lightgreen.set_bg_color('#99ff99')
+    cell_format_lightgreen.set_border(style=2)
+
+    cell_format_grey= workbook.add_format()
+    cell_format_grey.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_grey.set_bg_color('#808080')
+    cell_format_grey.set_border(style=2)
     row = 0
     col = 0
 
@@ -70,12 +102,26 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
         col += 1
         for unit in unitsTuple:
             try:
-                worksheet.write(row, col, getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit))
+                if getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) in ['13+8','13+9'] : 
+                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_blue)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '13+7' : 
+                   worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_darkgreen)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) in ['13+4','13+5','13+6','13+3','13+2','13+1','13'] : 
+                   worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_green)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '12': 
+                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_lightgreen)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '11': 
+                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_yellow)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) !=0 :
+                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit), cell_format_pink)
             except:
-                worksheet.write(row, col, 'Нет')
+                worksheet.write(row, col, 'Нет', cell_format_pink)
             col += 1
         row += 1
         col=0
+        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')')
+
+        
     workbook.close()
 
 def getStringOfGearAndRelic(dictOfPlayers={}, player='', unit=''):

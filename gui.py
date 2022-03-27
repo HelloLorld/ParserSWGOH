@@ -9,9 +9,23 @@
 
 
 import os
+
+from numpy import save
 import res_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog, QFileDialog
+from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
+from PyQt5.QtCore import QThread, pyqtSignal
+import time
+
+class MyThread(QThread):
+    change_value = pyqtSignal(int)
+
+    def run(self):
+        cnt = 0
+        while cnt < 100:
+            cnt+=1
+            time.sleep(0.5)
+            self.change_value.emit(cnt)
 
 
 class Ui_MainWindow(QDialog):
@@ -71,16 +85,19 @@ class Ui_MainWindow(QDialog):
                                        "    background-color: rgb(0, 105, 109);\n"
                                        "}\n"
                                        "")
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
+
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(350, 111, 290, 30))
         self.lineEdit.setStyleSheet("border-style: outset;\n"
                                     "border-width: 2px;\n"
                                     "border-radius: 8px;\n"
                                     "border-color: rgb(0, 0, 0);\n"
-                                    "background: transparent;")
+                                    "background: transparent;\n"
+                                    "font-size: 20px")
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setInputMask('000-000-000')
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(245, 115, 67, 23))
         self.label.setStyleSheet("background: transparent;\n"
@@ -183,14 +200,46 @@ class Ui_MainWindow(QDialog):
         self.label_6.setText(_translate("MainWindow", "SWGOH.GG"))
         self.label_5.setText(_translate("MainWindow", "GUILD HELPER"))
         self.pushButton_2.clicked.connect(self.changeDirectory)
+        
 
     def changeDirectory(self):
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.DirectoryOnly)
         fname = dialog.getExistingDirectory(self, 'Open file', os.getcwd())
         self.lineEdit_2.setText(fname)
-    def changeValueOfProgressBar(self):
-        self.progressBar.setProperty("value", self.progressBar.value()+10)
+
+    
+    def startProgressBar(self):
+        self.thread = MyThread()
+        self.thread.change_value.connect(self.changeValueOfProgressBar)
+        self.thread.start()
+        self.thread2 = MyThread()
+        self.thread2.change_value.connect(self.changeValueOfRobot)
+        self.thread2.start()
+
+    def changeValueOfProgressBar(self, val):
+        self.progressBar.setValue(val)
+
+    def changeValueOfRobot(self):
+        self.checkBox_2.setChecked(not self.checkBox_2.isChecked())
+
+    def show_popup(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("Игрок не найден")
+        idPlayer = self.lineEdit.text()
+        if idPlayer != "":
+            msg.setText("Мы не смогли найти игрока с ID: " + idPlayer)
+        else:
+            msg.setText("Вы не указали ID игрока")
+        msg.setStandardButtons(QMessageBox.Cancel)
+        x = msg.exec_()
+
+    def show_popup_ex(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("ОШИБКА")
+        msg.setText("Произошла непредвиденная проблема, попробуйте снова")
+        msg.setStandardButtons(QMessageBox.Cancel)
+        x = msg.exec_()
         
 
 
