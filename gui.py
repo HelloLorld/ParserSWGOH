@@ -9,6 +9,7 @@
 
 
 import os
+import threading
 
 import res_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -16,21 +17,32 @@ from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
 
+
 class MyThread(QThread):
+    def __init__(self, sleep):
+        super().__init__()
+        self.sleepBar = sleep
+        self.exit_event = threading.Event()
     change_value = pyqtSignal(int)
 
     def run(self):
         cnt = 0
-        while cnt < 100:
+        while cnt < 1000:
             cnt+=1
-            time.sleep(0.5)
+            time.sleep(self.sleepBar)
             self.change_value.emit(cnt)
+            if self.exit_event.is_set():
+                break
+
+    def stop(self):
+        self.exit_event.set()
 
 
 class Ui_MainWindow(QDialog):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(685, 500)
+        MainWindow.setMinimumSize(QtCore.QSize(685, 500))
         MainWindow.setMaximumSize(QtCore.QSize(685, 500))
         MainWindow.setStyleSheet(
             "background-image: url(:/resources/image/background.png);")
@@ -142,6 +154,8 @@ class Ui_MainWindow(QDialog):
                                       "border-color: rgb(0, 0, 0);\n"
                                       "background: transparent;")
         self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_2.setEnabled(False)
+        self.lineEdit_2.setText(os.getcwd().replace('\\','/'))
         self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
         self.checkBox.setGeometry(QtCore.QRect(355, 160, 57, 50))
         self.checkBox.setStyleSheet("QCheckBox::indicator {\n"
@@ -210,14 +224,16 @@ class Ui_MainWindow(QDialog):
 
     
     def startProgressBar(self):
-        self.thread = MyThread()
-        self.thread.change_value.connect(self.changeValueOfProgressBar)
-        self.thread.start()
-        self.thread2 = MyThread()
+        self.thread1 = MyThread(sleep=1.5)
+        self.thread1.change_value.connect(self.changeValueOfProgressBar)
+        self.thread1.start()
+        self.thread2 = MyThread(sleep=0.3)
         self.thread2.change_value.connect(self.changeValueOfRobot)
         self.thread2.start()
         self.pushButton.setEnabled(False)
         self.pushButton_2.setEnabled(False)
+        self.lineEdit.setEnabled(False)
+        self.checkBox.setEnabled(False)
 
     def changeValueOfProgressBar(self, val):
         self.progressBar.setValue(val)
