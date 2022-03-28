@@ -10,7 +10,6 @@
 
 import os
 
-from numpy import save
 import res_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
@@ -159,6 +158,7 @@ class Ui_MainWindow(QDialog):
                                     "}")
         self.checkBox.setText("")
         self.checkBox.setObjectName("checkBox")
+        self.checkBox.setChecked(True)
         self.checkBox_2 = QtWidgets.QCheckBox(self.centralwidget)
         self.checkBox_2.setGeometry(QtCore.QRect(570, 370, 57, 51))
         self.checkBox_2.setStyleSheet("QCheckBox::indicator {\n"
@@ -216,6 +216,8 @@ class Ui_MainWindow(QDialog):
         self.thread2 = MyThread()
         self.thread2.change_value.connect(self.changeValueOfRobot)
         self.thread2.start()
+        self.pushButton.setEnabled(False)
+        self.pushButton_2.setEnabled(False)
 
     def changeValueOfProgressBar(self, val):
         self.progressBar.setValue(val)

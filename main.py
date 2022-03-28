@@ -4,13 +4,27 @@ from swgoh_parser import NotFoundPlayer
 import threading
 import sys
 
-def run(id,needGuild, pathForSave):
-    print('run')
-    getInfoFromSWGOH(id=id.replace('-',''),needGuild=needGuild, pathForSave=pathForSave + '/')
+
+class ParserThread(threading.Thread):
+    def __init__(self, id,needGuild, pathForSave, mainWindow):
+        super().__init__()
+        self.PlayerId = id
+        self.PlayerNeedGuild = needGuild
+        self.PlayerPathForSave = pathForSave
+        self.window = mainWindow
+    def run(self):
+        print('run')
+        try:
+            getInfoFromSWGOH(id=self.PlayerId,needGuild=self.PlayerNeedGuild, pathForSave=self.PlayerPathForSave)
+        except NotFoundPlayer:
+            self.window.show_popup()
+        except Exception as ex:
+            print(ex)
+            self.window.show_popup_ex()
 
 def swCall():
     try:
-        myThread2 = threading.Thread(target=run, args=(ui.lineEdit.text(), ui.checkBox.isChecked(), ui.lineEdit_2.text(), ))
+        myThread2 = ParserThread(id=ui.lineEdit.text().replace('-',''),needGuild=ui.checkBox.isChecked(), pathForSave=ui.lineEdit_2.text() + '/', mainWindow=ui)
         myThread2.start()
         myThread = threading.Thread(target=ui.startProgressBar())
         myThread.start()
