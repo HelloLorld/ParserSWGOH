@@ -46,59 +46,69 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     unitsTuple = tuple(data.split('\n'))
     
     # Create a workbook and add a worksheet.
-    #workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%H_%M_%S")+ '.xlsx')
-    workbook = xlsxwriter.Workbook('Units.xlsx')
+    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    #workbook = xlsxwriter.Workbook('Units.xlsx')
     worksheet = workbook.add_worksheet()
+    cell_format_style =workbook.add_format()
+    cell_format_style.set_pattern(1)
+    cell_format_style.set_border(style=2)
+    cell_format_style.set_bg_color('#ffffff')
+    cell_format_style.set_align('center')
+
+
     cell_format_yellow = workbook.add_format()
     cell_format_yellow.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_yellow.set_bg_color('yellow')
+    cell_format_yellow.set_bg_color('#ffff00')
     cell_format_yellow.set_border(style=2)
+    cell_format_yellow.set_align('center')
 
     cell_format_green = workbook.add_format()
     cell_format_green.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_green.set_bg_color('#3caa3c')
+    cell_format_green.set_bg_color('#92d050')
     cell_format_green.set_border(style=2)
+    cell_format_green.set_align('center')
 
     cell_format_darkgreen = workbook.add_format()
     cell_format_darkgreen.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_darkgreen.set_bg_color('#008000')
+    cell_format_darkgreen.set_bg_color('#00b050')
     cell_format_darkgreen.set_border(style=2)
+    cell_format_darkgreen.set_align('center')
 
     cell_format_pink = workbook.add_format()
     cell_format_pink.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_pink.set_bg_color('#ffc0cb')
+    cell_format_pink.set_bg_color('#fde9d9')
     cell_format_pink.set_border(style=2)
+    cell_format_pink.set_align('center')
 
     cell_format_blue = workbook.add_format()
     cell_format_blue.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_blue.set_bg_color('#42aaff')
+    cell_format_blue.set_bg_color('#00b0f0')
     cell_format_blue.set_border(style=2)
+    cell_format_blue.set_align('center')
 
     cell_format_lightgreen = workbook.add_format()
     cell_format_lightgreen.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_lightgreen.set_bg_color('#99ff99')
+    cell_format_lightgreen.set_bg_color('#c4d79b')
     cell_format_lightgreen.set_border(style=2)
-
-    cell_format_grey= workbook.add_format()
-    cell_format_grey.set_pattern(1)  # This is optional when using a solid fill.
-    cell_format_grey.set_bg_color('#808080')
-    cell_format_grey.set_border(style=2)
+    cell_format_lightgreen.set_align('center')
+    worksheet.set_row(0, 20)
+    worksheet.set_column('A:AR', 20)
     row = 0
     col = 0
 
-    worksheet.write(row, col, 'Nickname')
-    worksheet.write(row, col + 1, 'Galactic power')
+    worksheet.write(row, col, 'Nickname',cell_format_style)
+    worksheet.write(row, col + 1, 'Galactic power',cell_format_style)
     col += 2
     for unit in unitsTuple:
-        worksheet.write(row, col, unit)
+        worksheet.write(row, col, unit, cell_format_style)
         col += 1
     
     row += 1
     col = 0
     for player in dictOfPlayers.keys():
-        worksheet.write(row, col, player)
+        worksheet.write(row, col, player,cell_format_style)
         col += 1
-        worksheet.write(row, col, dictOfPlayers[player]['galactic_power'] ) 
+        worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_style ) 
         col += 1
         for unit in unitsTuple:
             try:
@@ -119,10 +129,11 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
             col += 1
         row += 1
         col=0
-        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')')
+        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')', cell_format_style)
 
         
     workbook.close()
+
 
 def getStringOfGearAndRelic(dictOfPlayers={}, player='', unit=''):
     gearLvl = dictOfPlayers[player]['units'][unit]['gear_level']

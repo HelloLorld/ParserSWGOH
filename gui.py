@@ -155,7 +155,7 @@ class Ui_MainWindow(QDialog):
                                       "background: transparent;")
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.lineEdit_2.setEnabled(False)
-        self.lineEdit_2.setText(os.getcwd().replace('\\','/'))
+        self.lineEdit_2.setText(os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop').replace('\\','/'))
         self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
         self.checkBox.setGeometry(QtCore.QRect(355, 160, 57, 50))
         self.checkBox.setStyleSheet("QCheckBox::indicator {\n"
@@ -200,7 +200,7 @@ class Ui_MainWindow(QDialog):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "GUILD HElLPER"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "GUILD HELPER"))
         self.pushButton.setText(_translate("MainWindow", "GO"))
         self.pushButton_2.setText(_translate("MainWindow", "Change \n"
                                              " Directory"))
@@ -219,7 +219,7 @@ class Ui_MainWindow(QDialog):
     def changeDirectory(self):
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.DirectoryOnly)
-        fname = dialog.getExistingDirectory(self, 'Open file', os.getcwd())
+        fname = dialog.getExistingDirectory(self, 'Open file', os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         self.lineEdit_2.setText(fname)
 
     
@@ -256,6 +256,13 @@ class Ui_MainWindow(QDialog):
         msg = QMessageBox()
         msg.setWindowTitle("ОШИБКА")
         msg.setText("Произошла непредвиденная проблема, попробуйте снова")
+        msg.setStandardButtons(QMessageBox.Cancel)
+        x = msg.exec_()
+
+    def show_popup_success(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("ЗАВЕРШЕНО")
+        msg.setText("Файл статистики готов" )
         msg.setStandardButtons(QMessageBox.Cancel)
         x = msg.exec_()
         
