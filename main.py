@@ -20,7 +20,7 @@ class ParserThread(threading.Thread):
             getInfoFromSWGOH(
                 id=self.PlayerId, needGuild=self.PlayerNeedGuild, pathForSave=self.PlayerPathForSave)
             killResources(ui=self.window)
-            time.sleep(1.5)
+            time.sleep(3)
             self.window.progressBar.setValue(100)
             # self.window.show_popup_success()
             # self.window.progressBar.setValue(0)
@@ -49,11 +49,9 @@ class GuiThread(threading.Thread):
         self.window.startProgressBar()
 
 
-def killResources(ui, ex=False):
+def killResources(ui):
     ui.thread1.stop()
     ui.thread2.stop()
-    if ex:
-        ui.progressBar.setValue(0)
     ui.pushButton.setEnabled(True)
     ui.pushButton_2.setEnabled(True)
     ui.lineEdit.setEnabled(True)
@@ -80,12 +78,12 @@ def swCall():
 
     except NotFoundPlayer as ex:
         print(ex)
-        killResources(ui=ui, ex=True)
+        killResources(ui=ui)
         ui.show_popup()
         ui.progressBar.setValue(0)
     except Exception as ex:
         print(ex)
-        killResources(ui=ui, ex=True)
+        killResources(ui=ui)
         ui.show_popup_ex()
         ui.progressBar.setValue(0)
 

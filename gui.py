@@ -13,7 +13,7 @@ import threading
 
 import res_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QDialog, QFileDialog, QMainWindow
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
 
@@ -37,8 +37,46 @@ class MyThread(QThread):
     def stop(self):
         self.exit_event.set()
 
+class PopupException(QDialog):
+    def __init__(self, labelText, id=None):
+        super().__init__()
+        self.text = labelText
+        self.id = id
+    def setupUi(self, Form):
+        Form.setObjectName("Popup")
+        Form.resize(430, 140)
+        Form.setStyleSheet("background-color: rgb(192, 222, 229);")
+        self.pushButton = QtWidgets.QPushButton(Form)
+        self.pushButton.setGeometry(QtCore.QRect(300, 90, 105, 30))
+        self.pushButton.setStyleSheet("background: autoFill;\n"
+"background-color: rgb(1, 74, 88);\n"
+"color: rgb(255, 255, 255);\n"
+"font: 75 12pt \"Arial\";\n"
+"border-style: outset;\n"
+"border-radius: 15px;")
+        self.pushButton.setObjectName("pushButton")
+        self.label = QtWidgets.QLabel(Form)
+        self.label.setGeometry(QtCore.QRect(20, 40, 391, 41))
+        self.label.setStyleSheet("font: 75 14pt \"Arial\";\n"
+"background: transparent;\n"
+"color: rgb(1, 74, 88);")
+        self.label.setObjectName("label")
 
-class Ui_MainWindow(QDialog):
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Popup"))
+        self.pushButton.setText(_translate("Form", "OK"))
+        if self.id:
+            self.label.setText(_translate("Form", self.text + self.id))
+        else:
+            self.label.setText(_translate("Form", self.text))
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.pushButton.clicked.connect(self.close)
+
+class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(685, 500)
@@ -101,6 +139,7 @@ class Ui_MainWindow(QDialog):
 
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(350, 111, 290, 30))
+        # self.lineEdit.setAlignment(QtCore.Qt.AlignCenter)
         self.lineEdit.setStyleSheet("border-style: outset;\n"
                                     "border-width: 2px;\n"
                                     "border-radius: 8px;\n"
@@ -108,7 +147,7 @@ class Ui_MainWindow(QDialog):
                                     "background: transparent;\n"
                                     "font-size: 20px")
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setInputMask('000-000-000')
+        self.lineEdit.setInputMask('999-999-999')
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(245, 115, 67, 23))
         self.label.setStyleSheet("background: transparent;\n"
@@ -214,6 +253,7 @@ class Ui_MainWindow(QDialog):
         self.label_6.setText(_translate("MainWindow", "SWGOH.GG"))
         self.label_5.setText(_translate("MainWindow", "GUILD HELPER"))
         self.pushButton_2.clicked.connect(self.changeDirectory)
+        # self.connect(self.progressBar.value==100, self.show_popup_success)
         
 
     def changeDirectory(self):
@@ -242,29 +282,19 @@ class Ui_MainWindow(QDialog):
         self.checkBox_2.setChecked(not self.checkBox_2.isChecked())
 
     def show_popup(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("Игрок не найден")
-        idPlayer = self.lineEdit.text()
-        if idPlayer != "":
-            msg.setText("Мы не смогли найти игрока с ID: " + idPlayer)
-        else:
-            msg.setText("Вы не указали ID игрока")
-        msg.setStandardButtons(QMessageBox.Cancel)
-        x = msg.exec_()
+        msg = PopupException("Can't find the player with id: ", self.lineEdit.text())
+        msg.setupUi(msg)
+        msg.exec_()
 
     def show_popup_ex(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("ОШИБКА")
-        msg.setText("Произошла непредвиденная проблема, попробуйте снова")
-        msg.setStandardButtons(QMessageBox.Cancel)
-        x = msg.exec_()
+        msg = PopupException("An unexpected error has occurred")
+        msg.setupUi(msg)
+        msg.exec_()
 
     def show_popup_success(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("ЗАВЕРШЕНО")
-        msg.setText("Файл статистики готов" )
-        msg.setStandardButtons(QMessageBox.Cancel)
-        x = msg.exec_()
+        msg = PopupException("Statistic was successfully complete")
+        msg.setupUi(msg)
+        msg.exec_()
         
 
 
