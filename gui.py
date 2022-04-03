@@ -256,6 +256,7 @@ class Ui_MainWindow(QMainWindow):
         self.label_2.setText(_translate("MainWindow", "Only User"))
         self.label_3.setToolTip(_translate(
             "MainWindow", "<span style=\'font-size: 13px;\'>Переключатель в режиме \"All guild\" предоставляет информацию о всех участниках гильдии в которой состоит игрок.</span>"))
+        self.label_3.setToolTipDuration(0)
         self.label_3.setText(_translate(
             "MainWindow", "<html><head/><body><p>All Guild <span style=\" vertical-align:super;\">ⓘ</span></p></body></html>"))
         self.label_4.setText(_translate("MainWindow", "Directory"))

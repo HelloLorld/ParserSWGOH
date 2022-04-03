@@ -38,16 +38,35 @@ def getInfoAboutAllPlayers(allyCodes=[]):
                       ] = dictWithGalacticPowerAndUnits
     return dictOfPlayers
 
+def getAllUnitsFromGame():
+    req = requests.get('https://swgoh.gg/api/characters')
+    print(req.status_code)
+    if req.status_code == 200:
+        jsonReqUnits = json.loads(req.text)
+        arrayUnits = []
+        for unit in jsonReqUnits:
+            arrayUnits.append(unit['name'])
+        return arrayUnits
 
 # Записываем все данные в Excel
 def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     f = open('config_units.txt', 'r', encoding='UTF-8')
     data = f.read()
-    unitsTuple = tuple(data.split('\n'))
+    unitsTuple = []
+    for unit in data.split('\n'):
+        if unit not in unitsTuple:
+            unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
     #workbook = xlsxwriter.Workbook('Units.xlsx')
+    writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
+    arrayUnits = getAllUnitsFromGame()
+    if arrayUnits:
+        writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=arrayUnits)
+    workbook.close()
+
+def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     worksheet = workbook.add_worksheet()
     cell_format_style =workbook.add_format()
     cell_format_style.set_pattern(1)
@@ -92,7 +111,7 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     cell_format_lightgreen.set_border(style=2)
     cell_format_lightgreen.set_align('center')
     worksheet.set_row(0, 20)
-    worksheet.set_column('A:AR', 20)
+    # worksheet.set_column('A:AR', 20)
     row = 0
     col = 0
 
@@ -132,7 +151,6 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
         worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')', cell_format_style)
 
         
-    workbook.close()
 
 
 def getStringOfGearAndRelic(dictOfPlayers={}, player='', unit=''):
