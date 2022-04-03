@@ -13,10 +13,18 @@ import threading
 
 import res_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QDialog, QFileDialog, QMainWindow, QLineEdit
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
 
+
+class LineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        QLineEdit.__init__(self, parent=parent)
+        self.setPlaceholderText('000-000-000')
+
+    def focusInEvent(self, event):
+        self.setInputMask('999-999-999')
 
 class MyThread(QThread):
     def __init__(self, sleep):
@@ -137,9 +145,10 @@ class Ui_MainWindow(QMainWindow):
         self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
 
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        # self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit = LineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(350, 111, 290, 30))
-        # self.lineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit.setAlignment(QtCore.Qt.AlignCenter)
         self.lineEdit.setStyleSheet("border-style: outset;\n"
                                     "border-width: 2px;\n"
                                     "border-radius: 8px;\n"
@@ -147,7 +156,7 @@ class Ui_MainWindow(QMainWindow):
                                     "background: transparent;\n"
                                     "font-size: 20px")
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setInputMask('999-999-999')
+        # self.lineEdit.setInputMask('999-999-999')
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(245, 115, 67, 23))
         self.label.setStyleSheet("background: transparent;\n"
