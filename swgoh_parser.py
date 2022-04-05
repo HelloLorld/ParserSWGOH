@@ -58,8 +58,8 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
             unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
-    #workbook = xlsxwriter.Workbook('Units.xlsx')
+    # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    workbook = xlsxwriter.Workbook('Units.xlsx')
     writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
     arrayUnits = getAllUnitsFromGame()
     if arrayUnits:
@@ -70,7 +70,7 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     worksheet = workbook.add_worksheet()
     cell_format_style =workbook.add_format()
     cell_format_style.set_pattern(1)
-    cell_format_style.set_border(style=2)
+    cell_format_style.set_border(style=1)
     cell_format_style.set_bg_color('#ffffff')
     cell_format_style.set_align('center')
 
@@ -78,40 +78,55 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     cell_format_yellow = workbook.add_format()
     cell_format_yellow.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_yellow.set_bg_color('#ffff00')
-    cell_format_yellow.set_border(style=2)
+    cell_format_yellow.set_border(style=1)
     cell_format_yellow.set_align('center')
 
     cell_format_green = workbook.add_format()
     cell_format_green.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_green.set_bg_color('#92d050')
-    cell_format_green.set_border(style=2)
+    cell_format_green.set_border(style=1)
     cell_format_green.set_align('center')
 
     cell_format_darkgreen = workbook.add_format()
     cell_format_darkgreen.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_darkgreen.set_bg_color('#00b050')
-    cell_format_darkgreen.set_border(style=2)
+    cell_format_darkgreen.set_border(style=1)
     cell_format_darkgreen.set_align('center')
 
     cell_format_pink = workbook.add_format()
     cell_format_pink.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_pink.set_bg_color('#fde9d9')
-    cell_format_pink.set_border(style=2)
+    cell_format_pink.set_border(style=1)
     cell_format_pink.set_align('center')
 
     cell_format_blue = workbook.add_format()
     cell_format_blue.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_blue.set_bg_color('#00b0f0')
-    cell_format_blue.set_border(style=2)
+    cell_format_blue.set_border(style=1)
     cell_format_blue.set_align('center')
 
     cell_format_lightgreen = workbook.add_format()
     cell_format_lightgreen.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_lightgreen.set_bg_color('#c4d79b')
-    cell_format_lightgreen.set_border(style=2)
+    cell_format_lightgreen.set_border(style=1)
     cell_format_lightgreen.set_align('center')
+
+    cell_format_red = workbook.add_format({'num_format':"#,##0" })
+    cell_format_red.set_font_color('red')
+    cell_format_red.set_pattern(1)
+    cell_format_red.set_border(style=1)
+    cell_format_red.set_bg_color('#ffffff')
+    cell_format_red.set_align('center')
+
+    cell_format_num = workbook.add_format({'num_format':"#,##0" })
+    cell_format_num.set_pattern(1)
+    cell_format_num.set_border(style=1)
+    cell_format_num.set_bg_color('#ffffff')
+    cell_format_num.set_align('center')
+
+
     worksheet.set_row(0, 20)
-    # worksheet.set_column('A:AR', 20)
+    worksheet.set_column('B:B', 13)
     row = 0
     col = 0
 
@@ -119,7 +134,11 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     worksheet.write(row, col + 1, 'Galactic power',cell_format_style)
     col += 2
     for unit in unitsTuple:
-        worksheet.write(row, col, unit, cell_format_style)
+        unit = unit.split(':')
+        if len(unit)>1:
+            worksheet.write(row, col, unit[1], cell_format_style)
+        else:
+            worksheet.write(row, col, unit[0], cell_format_style) 
         col += 1
     
     row += 1
@@ -127,9 +146,10 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     for player in dictOfPlayers.keys():
         worksheet.write(row, col, player,cell_format_style)
         col += 1
-        worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_style ) 
+        worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_num ) 
         col += 1
         for unit in unitsTuple:
+            unit = unit.split(':')[0]
             try:
                 if getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) in ['13+8','13+9'] : 
                     worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_blue)
@@ -148,7 +168,8 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
             col += 1
         row += 1
         col=0
-        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')', cell_format_style)
+        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')', cell_format_red)
+
 
         
 
@@ -210,7 +231,7 @@ def main():
     # if (input().lower().find("y") != -1):
     #     needGuild = True
     try:
-        getInfoFromSWGOH(id=785425257, needGuild=True)
+        getInfoFromSWGOH(id=785425257, needGuild=False)
     except Exception as ex:
         print(ex)
 

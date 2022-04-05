@@ -145,8 +145,9 @@ class Ui_MainWindow(QMainWindow):
         self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
 
-        # self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit = LineEdit(self.centralwidget)
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setInputMask('000-000-000')
+        # self.lineEdit = LineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(350, 111, 290, 30))
         self.lineEdit.setAlignment(QtCore.Qt.AlignCenter)
         self.lineEdit.setStyleSheet("border-style: outset;\n"
