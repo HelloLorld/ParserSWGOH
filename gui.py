@@ -126,12 +126,19 @@ class Ui_MainWindow(QMainWindow):
         font.setBold(False)
         font.setWeight(50)
         self.pushButton_2.setFont(font)
-        self.pushButton_2.setStyleSheet("background: autoFill;\n"
-                                        "background-color: rgb(1, 74, 88);\n"
-                                        "color: rgb(255, 255, 255);\n"
-                                        "border-style: outset;\n"
-                                        "border-width: 2px;\n"
-                                        "border-radius: 23px;")
+        self.pushButton_2.setStyleSheet(
+                                      "QPushButton {\n"
+                                      "background: autoFill;\n"
+                                      "background-color: rgb(1, 74, 88);\n"
+                                      "color: rgb(255, 255, 255);\n"
+                                      "border-style: outset;\n"
+                                      "border-width: 2px;\n"
+                                      "border-radius: 23px;\n"
+                                      "}\n"
+                                      "QPushButton::pressed\n"
+                                    "{\n"
+                                    "background-color: rgb(97, 164, 173);\n"
+                                    "}")
         self.pushButton_2.setObjectName("pushButton_2")
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.progressBar.setGeometry(QtCore.QRect(199, 423, 444, 15))
@@ -162,7 +169,8 @@ class Ui_MainWindow(QMainWindow):
                                     "border-radius: 8px;\n"
                                     "border-color: rgb(0, 0, 0);\n"
                                     "background: transparent;\n"
-                                    "font-size: 20px")
+                                    "font-size: 20px;\n"
+                                    )
         self.lineEdit.setObjectName("lineEdit")
         # self.lineEdit.setInputMask('999-999-999')
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -283,6 +291,7 @@ class Ui_MainWindow(QMainWindow):
         dialog.setFileMode(QFileDialog.DirectoryOnly)
         fname = dialog.getExistingDirectory(self, 'Open file', os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         self.lineEdit_2.setText(fname)
+        self.setFocusLineEdit()
 
     
     def startProgressBar(self):

@@ -42,13 +42,18 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background: autoFill;
+     <string notr="true">QPushButton {
+background: autoFill;
 background-color: rgb(1, 74, 88);
 color: rgb(255, 255, 255);
 font: 75 12pt &quot;Arial&quot;;
 border-style: outset;
 border-width: 2px;
-border-radius: 23px;</string>
+border-radius: 23px;
+}
+QPushButton::pressed {
+	background-color: rgb(97, 164, 173);
+}</string>
     </property>
     <property name="text">
      <string>GO</string>
