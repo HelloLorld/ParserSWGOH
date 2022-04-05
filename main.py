@@ -22,6 +22,9 @@ class ParserThread(threading.Thread):
             killResources(ui=self.window)
             time.sleep(3)
             self.window.progressBar.setValue(100)
+            time.sleep(5)
+            self.window.progressBar.setValue(0)
+            self.window.checkBox_2.setChecked(False)
             # self.window.show_popup_success()
             # self.window.progressBar.setValue(0)
         except NotFoundPlayer as ex:
@@ -65,7 +68,6 @@ def swCall():
     myThread2.start()
     myThread = GuiThread(mainWindow=ui)
     myThread.start()
-
 
 
     # Обработка ошибок

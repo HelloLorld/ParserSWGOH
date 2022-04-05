@@ -111,14 +111,13 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     cell_format_lightgreen.set_border(style=1)
     cell_format_lightgreen.set_align('center')
 
-    cell_format_red = workbook.add_format({'num_format':"#,##0" })
-    cell_format_red.set_font_color('red')
+    cell_format_red = workbook.add_format({'num_format':"#,##0", 'bold': True})
     cell_format_red.set_pattern(1)
     cell_format_red.set_border(style=1)
     cell_format_red.set_bg_color('#ffffff')
     cell_format_red.set_align('center')
 
-    cell_format_num = workbook.add_format({'num_format':"#,##0" })
+    cell_format_num = workbook.add_format({'num_format':"#,##0"})
     cell_format_num.set_pattern(1)
     cell_format_num.set_border(style=1)
     cell_format_num.set_bg_color('#ffffff')

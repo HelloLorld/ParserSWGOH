@@ -103,13 +103,20 @@ class Ui_MainWindow(QMainWindow):
         font.setItalic(False)
         font.setWeight(9)
         self.pushButton.setFont(font)
-        self.pushButton.setStyleSheet("background: autoFill;\n"
+        self.pushButton.setStyleSheet(
+                                      "QPushButton {\n"
+                                      "background: autoFill;\n"
                                       "background-color: rgb(1, 74, 88);\n"
                                       "color: rgb(255, 255, 255);\n"
                                       "font: 75 12pt \"Arial\";\n"
                                       "border-style: outset;\n"
                                       "border-width: 2px;\n"
-                                      "border-radius: 23px;")
+                                      "border-radius: 23px;\n"
+                                      "}\n"
+                                      "QPushButton::pressed\n"
+                                    "{\n"
+                                    "background-color: rgb(97, 164, 173);\n"
+                                    "}")
         self.pushButton.setObjectName("pushButton")
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(515, 295, 130, 46))
@@ -263,9 +270,13 @@ class Ui_MainWindow(QMainWindow):
         self.label_4.setText(_translate("MainWindow", "Directory"))
         self.label_6.setText(_translate("MainWindow", "SWGOH.GG"))
         self.label_5.setText(_translate("MainWindow", "GUILD HELPER"))
+        self.setFocusLineEdit()
         self.pushButton_2.clicked.connect(self.changeDirectory)
+        self.checkBox.clicked.connect(self.setFocusLineEdit)
         # self.connect(self.progressBar.value==100, self.show_popup_success)
         
+    def setFocusLineEdit(self):
+        self.lineEdit.setFocus()
 
     def changeDirectory(self):
         dialog = QFileDialog()
