@@ -91,13 +91,16 @@ def swCall():
 
 
 def main():
+    import sys
+    import ctypes
+    myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QtWidgets.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon('ico.ico'))
     MainWindow = QtWidgets.QMainWindow()
-    global ui
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    ui.pushButton.clicked.connect(swCall)
     sys.exit(app.exec_())
 
 
