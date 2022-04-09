@@ -34,7 +34,7 @@ Grand Admiral Thrawn:Траун
 Wat Tambor:Тамбор
 The Armorer:Кузнец
 Moff Gideon:Гидеон
-Rey : ЛРей
+Rey:ЛРей
 Supreme Leader Kylo Ren:ЛКайло
 Sith Eternal Emperor:ЛПалп
 Lord Vader:ЛВ

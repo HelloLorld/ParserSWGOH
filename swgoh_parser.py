@@ -1,4 +1,5 @@
 from datetime import datetime
+from tkinter.tix import Tree
 import requests
 import json
 import xlsxwriter
@@ -55,11 +56,11 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     unitsTuple = []
     for unit in data.split('\n'):
         if unit not in unitsTuple:
-            unitsTuple.append(unit)
+            if unit != "": unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
-    # workbook = xlsxwriter.Workbook('Units.xlsx')
+    # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    workbook = xlsxwriter.Workbook('Units.xlsx')
     writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
     arrayUnits = getAllUnitsFromGame()
     if arrayUnits:
@@ -105,6 +106,12 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     cell_format_blue.set_border(style=1)
     cell_format_blue.set_align('center')
 
+    cell_format_orange = workbook.add_format()
+    cell_format_orange.set_pattern(1)  # This is optional when using a solid fill.
+    cell_format_orange.set_bg_color('#FF6600')
+    cell_format_orange.set_border(style=1)
+    cell_format_orange.set_align('center')
+
     cell_format_lightgreen = workbook.add_format()
     cell_format_lightgreen.set_pattern(1)  # This is optional when using a solid fill.
     cell_format_lightgreen.set_bg_color('#c4d79b')
@@ -124,14 +131,18 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     cell_format_num.set_align('center')
 
 
-    worksheet.set_row(0, 20)
-    worksheet.set_column('B:B', 13)
+    worksheet.set_column(3,len(unitsTuple)+2, 7)
+    worksheet.set_column('A:A', 3)
+    worksheet.set_column('C:C', 13)
     row = 0
     col = 0
 
+    worksheet.write(row, col, '№',cell_format_style)
+    col += 1
     worksheet.write(row, col, 'Nickname',cell_format_style)
-    worksheet.write(row, col + 1, 'Galactic power',cell_format_style)
-    col += 2
+    col += 1
+    worksheet.write(row, col, 'Galactic power',cell_format_style)
+    col += 1
     for unit in unitsTuple:
         unit = unit.split(':')
         if len(unit)>1:
@@ -142,15 +153,21 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     
     row += 1
     col = 0
+    maxLengthNickname = 0
     for player in dictOfPlayers.keys():
+        if (len(player)>maxLengthNickname): maxLengthNickname = len(player)
         worksheet.write(row, col, player,cell_format_style)
+        col += 1
+        worksheet.write(row, col, row,cell_format_style)
         col += 1
         worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_num ) 
         col += 1
         for unit in unitsTuple:
             unit = unit.split(':')[0]
             try:
-                if getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) in ['13+8','13+9'] : 
+                if getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) =='13+9' : 
+                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_orange)
+                elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '13+8' : 
                     worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_blue)
                 elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '13+7' : 
                    worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_darkgreen)
@@ -167,7 +184,17 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
             col += 1
         row += 1
         col=0
-        worksheet.write_formula(row, col+1, '=sum(B2:B' + str(len(dictOfPlayers)+1) + ')', cell_format_red)
+    if maxLengthNickname<5:
+        worksheet.set_column('B:B', maxLengthNickname)
+    else:
+        worksheet.set_column('B:B', maxLengthNickname-2)
+    worksheet.write_formula(row, col+2, '=sum(C2:C%s' % str(len(dictOfPlayers)+1) + ')', cell_format_red)
+    col += 3
+    for i in range(3, len(unitsTuple)+3):
+        diapazon = chr(ord('A')+i) if (i //
+                                    26) < 1 else chr(ord('A')+((i//26)-1)) + chr(ord('A')+((i%26)))
+        worksheet.write_formula(row, col, '=COUNTIF(' + diapazon + str(2) + ':' + diapazon + str(len(dictOfPlayers)+1) +',"<>Нет")', cell_format_num)
+        col+=1
 
 
         
@@ -217,11 +244,24 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
             dictOfPlayers[key]['units'] = arrOfUnitsToDict(
                 dictOfPlayers[key]['units'])
         print(dictOfPlayers)
+        dictOfPlayers = sortDictByGalacticPower(dictPlayers=dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
         return 0
     else:
         raise NotFoundPlayer("Мы не смогли найти игрока")
 
+
+def sortDictByGalacticPower(dictPlayers = {}):
+    values = list(dictPlayers.values())
+    for i in range(len(values)-1):
+        for j in range(i, len(values)):
+            if values[i]['galactic_power']<values[j]['galactic_power']: values[i],values[j] = values[j],values[i]
+    newDict = {}
+    for value in values:
+        for player in dictPlayers.keys():
+            if dictPlayers[player]['galactic_power'] == value['galactic_power']:
+                newDict[player]=dictPlayers[player]
+    return newDict
 
 def main():
     # id = int(input('Enter id: '))

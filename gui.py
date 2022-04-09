@@ -255,9 +255,6 @@ class Ui_MainWindow(QMainWindow):
         self.checkBox_2.setText("")
         self.checkBox_2.setObjectName("checkBox_2")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
