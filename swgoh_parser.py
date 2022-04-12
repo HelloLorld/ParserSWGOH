@@ -132,14 +132,14 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
 
 
     worksheet.set_column(3,len(unitsTuple)+2, 7)
-    worksheet.set_column('B:B', 3)
+    worksheet.set_column('A:A', 3)
     worksheet.set_column('C:C', 13)
     row = 0
     col = 0
 
-    worksheet.write(row, col, 'Nickname',cell_format_style)
-    col += 1
     worksheet.write(row, col, '№',cell_format_style)
+    col += 1
+    worksheet.write(row, col, 'Nickname',cell_format_style)
     col += 1
     worksheet.write(row, col, 'Galactic power',cell_format_style)
     col += 1
@@ -156,9 +156,9 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     maxLengthNickname = 0
     for player in dictOfPlayers.keys():
         if (len(player)>maxLengthNickname): maxLengthNickname = len(player)
-        worksheet.write(row, col, player,cell_format_style)
-        col += 1
         worksheet.write(row, col, row,cell_format_style)
+        col += 1
+        worksheet.write(row, col, player,cell_format_style)
         col += 1
         worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_num ) 
         col += 1
@@ -185,9 +185,9 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
         row += 1
         col=0
     if maxLengthNickname<5:
-        worksheet.set_column('A:A', maxLengthNickname)
+        worksheet.set_column('B:B', maxLengthNickname)
     else:
-        worksheet.set_column('A:A', maxLengthNickname-2)
+        worksheet.set_column('B:B', maxLengthNickname-2)
     worksheet.write_formula(row, col+2, '=sum(C2:C%s' % str(len(dictOfPlayers)+1) + ')', cell_format_red)
     col += 3
     for i in range(3, len(unitsTuple)+3):
