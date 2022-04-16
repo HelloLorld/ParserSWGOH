@@ -51,7 +51,7 @@ class PopupException(QDialog):
         self.text = labelText
         self.id = id
     def setupUi(self, Form):
-        Form.setObjectName("Popup")
+        Form.setObjectName("Error")
         Form.resize(430, 140)
         Form.setStyleSheet("background-color: rgb(192, 222, 229);")
         self.pushButton = QtWidgets.QPushButton(Form)
@@ -75,7 +75,7 @@ class PopupException(QDialog):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Popup"))
+        Form.setWindowTitle(_translate("Form", "Error"))
         self.pushButton.setText(_translate("Form", "OK"))
         if self.id:
             self.label.setText(_translate("Form", self.text + self.id))

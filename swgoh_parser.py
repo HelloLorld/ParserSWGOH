@@ -1,4 +1,5 @@
 from datetime import datetime
+from operator import le
 from tkinter.tix import Tree
 import requests
 import json
@@ -49,14 +50,45 @@ def getAllUnitsFromGame():
             arrayUnits.append(unit['name'])
         return arrayUnits
 
+def getValidString(stringConfig=""):
+    myString = ""
+    if (stringConfig.find(':')==stringConfig.rfind(':')) and stringConfig.find(':')!=-1:
+        i = 0
+        while stringConfig[i] == ' ':
+            i+=1
+        while stringConfig[i] != ':':
+            myString+=stringConfig[i]
+            i+=1
+        i-=1
+        i = len(myString)-1
+        while myString[i] == ' ':
+            i-=1
+        myString=myString[:i+1]
+        i = stringConfig.find(':')
+        myString+=stringConfig[i]
+        i+=1
+        while stringConfig[i] == ' ':
+            i+=1
+        while i < len(stringConfig)-1:
+            myString+=stringConfig[i]
+            i+=1
+        i = len(myString)-1
+        while myString[i] == ' ':
+            i-=1
+        myString=myString[:i+2]
+        return myString
+    else: return 'InvalidString'
+
 # Записываем все данные в Excel
 def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
     f = open('config_units.txt', 'r', encoding='UTF-8')
     data = f.read()
     unitsTuple = []
     for unit in data.split('\n'):
-        if unit not in unitsTuple:
-            if unit != "": unitsTuple.append(unit)
+        unit = getValidString(stringConfig=unit)
+        if unit != 'InvalidString':
+            if unit not in unitsTuple:
+                if unit != "": unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
     # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
@@ -154,6 +186,7 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
     row += 1
     col = 0
     maxLengthNickname = 0
+    legendCount = 0
     for player in dictOfPlayers.keys():
         if (len(player)>maxLengthNickname): maxLengthNickname = len(player)
         worksheet.write(row, col, row,cell_format_style)
@@ -165,6 +198,7 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
         for unit in unitsTuple:
             unit = unit.split(':')[0]
             try:
+                if dictOfPlayers[player]['units'][unit]['galactic_legend']: legendCount += 1
                 if getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) =='13+9' : 
                     worksheet.write(row, col,  getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit),cell_format_orange)
                 elif getStringOfGearAndRelic(dictOfPlayers=dictOfPlayers, player=player, unit=unit) == '13+8' : 
@@ -188,12 +222,14 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
         worksheet.set_column('B:B', maxLengthNickname)
     else:
         worksheet.set_column('B:B', maxLengthNickname-2)
+    worksheet.write(row, col, 'Лег', cell_format_red)
+    worksheet.write(row, col+1, legendCount, cell_format_red)
     worksheet.write_formula(row, col+2, '=sum(C2:C%s' % str(len(dictOfPlayers)+1) + ')', cell_format_red)
     col += 3
     for i in range(3, len(unitsTuple)+3):
         diapazon = chr(ord('A')+i) if (i //
                                     26) < 1 else chr(ord('A')+((i//26)-1)) + chr(ord('A')+((i%26)))
-        worksheet.write_formula(row, col, '=COUNTIF(' + diapazon + str(2) + ':' + diapazon + str(len(dictOfPlayers)+1) +',"<>Нет")', cell_format_num)
+        worksheet.write_formula(row, col, '=COUNTIF(' + diapazon + str(2) + ':' + diapazon + str(len(dictOfPlayers)+1) +',"<>Нет")', cell_format_red)
         col+=1
 
 
@@ -220,6 +256,7 @@ def arrOfUnitsToDict(units=[]):  # Массив персонажей перед�
         lvlOfUnit['gear_level'] = gearLvl
         lvlOfUnit['relic_tier'] = unit['data']['relic_tier']-2
         lvlOfUnit['stars'] = unit['data']['rarity']
+        lvlOfUnit['galactic_legend'] = unit['data']['is_galactic_legend']
         dictOfUnits[unit['data']['name']] = lvlOfUnit
     return dictOfUnits
 
