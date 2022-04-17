@@ -1,31 +1,43 @@
 from datetime import datetime
-from operator import le
-from tkinter.tix import Tree
 import requests
 import json
 import xlsxwriter
-
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
 
 class NotFoundPlayer(Exception):  # Исключение о том, что игрок не был найден
     pass
 
+def driverRun(url=""):
+    try:
+        driver.get(url)
+        driver.implicitly_wait(3)
+        codeOfPage = driver.page_source
+        soup = BeautifulSoup(codeOfPage, 'html.parser')
+        some = soup.find("pre").text
+        return some
+    except Exception as ex:
+        print(ex)
+        return None
+
+
 
 def getJsonInfoOfPlayer(id=0):  # Запрос информации об игроке
-    req = requests.get('https://swgoh.gg/api/player/' + str(id))
-    print(req.status_code)
-    if req.status_code == 200:
-        jsonReqPlayer = json.loads(req.text)
+    try:
+        jsonReqPlayer = json.loads(driverRun('https://swgoh.gg/api/player/' + str(id)))
         return jsonReqPlayer
+    except:
+        return None
 
 
 def getInfoAboutGuild(id=''):  # Запрос информации о гильдии
     try:
-        req = requests.get('https://swgoh.gg/api/guild-profile/' + id)
-        if req.status_code == 200:
-            jsonReqGuild = json.loads(req.text)
-            return jsonReqGuild['data']['members']
-    except requests.RequestException as e:
-        print(e)
+        jsonReqGuild = json.loads(driverRun('https://swgoh.gg/api/guild-profile/' + id))
+        return jsonReqGuild['data']['members']
+    except:
+        return None
 
 
 # Получение информации по всем игрокам из гильдии
@@ -41,14 +53,14 @@ def getInfoAboutAllPlayers(allyCodes=[]):
     return dictOfPlayers
 
 def getAllUnitsFromGame():
-    req = requests.get('https://swgoh.gg/api/characters')
-    print(req.status_code)
-    if req.status_code == 200:
-        jsonReqUnits = json.loads(req.text)
+    try:
+        jsonReqUnits = json.loads(driverRun('https://swgoh.gg/api/characters'))
         arrayUnits = []
         for unit in jsonReqUnits:
             arrayUnits.append(unit['name'])
         return arrayUnits
+    except:
+        return None
 
 def getValidString(stringConfig=""):
     myString = ""
@@ -69,13 +81,13 @@ def getValidString(stringConfig=""):
         i+=1
         while stringConfig[i] == ' ':
             i+=1
-        while i < len(stringConfig)-1:
+        while i < len(stringConfig):
             myString+=stringConfig[i]
             i+=1
         i = len(myString)-1
         while myString[i] == ' ':
             i-=1
-        myString=myString[:i+2]
+        myString=myString[:i+1]
         return myString
     else: return 'InvalidString'
 
@@ -91,8 +103,8 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
                 if unit != "": unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
-    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
-    # workbook = xlsxwriter.Workbook('Units.xlsx')
+    # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    workbook = xlsxwriter.Workbook('Units.xlsx')
     writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
     arrayUnits = getAllUnitsFromGame()
     if arrayUnits:
@@ -262,6 +274,12 @@ def arrOfUnitsToDict(units=[]):  # Массив персонажей перед�
 
 
 def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная функция
+    global driver
+    options = Options()
+    options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--headless")
+    driver = webdriver.Chrome('resources\chromedriver\chromedriver.exe', options=options)
     jsonPlayerInfo = getJsonInfoOfPlayer(id=id)
     if jsonPlayerInfo != None:
         dictOfPlayers = {}
@@ -283,8 +301,12 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
         print(dictOfPlayers)
         dictOfPlayers = sortDictByGalacticPower(dictPlayers=dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
+        driver.close()
+        driver.quit()
         return 0
     else:
+        driver.close()
+        driver.quit()
         raise NotFoundPlayer("Мы не смогли найти игрока")
 
 
@@ -310,6 +332,7 @@ def main():
         getInfoFromSWGOH(id=785425257, needGuild=False)
     except Exception as ex:
         print(ex)
+
 
 
 if __name__ == "__main__":
