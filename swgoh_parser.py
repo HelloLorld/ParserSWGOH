@@ -91,8 +91,8 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
                 if unit != "": unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
-    # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
-    workbook = xlsxwriter.Workbook('Units.xlsx')
+    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    # workbook = xlsxwriter.Workbook('Units.xlsx')
     writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
     arrayUnits = getAllUnitsFromGame()
     if arrayUnits:
