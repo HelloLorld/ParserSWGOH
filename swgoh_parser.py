@@ -279,6 +279,7 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
     options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--headless")
+    options.add_argument('CREATE_NO_WINDOW')
     driver = webdriver.Chrome('resources\chromedriver\chromedriver.exe', options=options)
     jsonPlayerInfo = getJsonInfoOfPlayer(id=id)
     if jsonPlayerInfo != None:

@@ -63,12 +63,12 @@ def killResources(ui):
 
 
 def swCall():
-    myThread2 = ParserThread(id=ui.lineEdit.text().replace(
-        '-', ''), needGuild=ui.checkBox.isChecked(), pathForSave=ui.lineEdit_2.text() + '/', mainWindow=ui)
-    myThread2.start()
     myThread = GuiThread(mainWindow=ui)
     myThread.start()
 
+    myThread2 = ParserThread(id=ui.lineEdit.text().replace(
+        '-', ''), needGuild=ui.checkBox.isChecked(), pathForSave=ui.lineEdit_2.text() + '/', mainWindow=ui)
+    myThread2.start()
 
     # Обработка ошибок
     try:
