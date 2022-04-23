@@ -1,10 +1,12 @@
 from datetime import datetime
-import requests
 import json
+from subprocess import CREATE_NO_WINDOW
+from tkinter import OptionMenu
+from grpc import services
 import xlsxwriter
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 
 class NotFoundPlayer(Exception):  # Исключение о том, что игрок не был найден
@@ -27,6 +29,7 @@ def driverRun(url=""):
 def getJsonInfoOfPlayer(id=0):  # Запрос информации об игроке
     try:
         jsonReqPlayer = json.loads(driverRun('https://swgoh.gg/api/player/' + str(id)))
+        print(id)
         return jsonReqPlayer
     except:
         return None
@@ -44,6 +47,7 @@ def getInfoAboutGuild(id=''):  # Запрос информации о гильд
 def getInfoAboutAllPlayers(allyCodes=[]):
     dictOfPlayers = {}
     for allyCode in allyCodes:
+        if not allyCode: continue
         dictWithGalacticPowerAndUnits = {}
         jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
         dictWithGalacticPowerAndUnits['galactic_power'] = jsonReqPlayer['data']['galactic_power']
@@ -103,8 +107,8 @@ def writeDataIntoExcelTable(dictOfPlayers={}, path=""):
                 if unit != "": unitsTuple.append(unit)
     
     # Create a workbook and add a worksheet.
-    # workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
-    workbook = xlsxwriter.Workbook('Units.xlsx')
+    workbook = xlsxwriter.Workbook(path + 'statistics_'+ datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+ '.xlsx')
+    # workbook = xlsxwriter.Workbook('Units.xlsx')
     writeDataToSheet(workbook=workbook, dictOfPlayers=dictOfPlayers, unitsTuple=unitsTuple)
     arrayUnits = getAllUnitsFromGame()
     if arrayUnits:
@@ -279,8 +283,10 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
     options.add_argument("user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--headless")
-    options.add_argument('CREATE_NO_WINDOW')
-    driver = webdriver.Chrome('resources\chromedriver\chromedriver.exe', options=options)
+    # options.add_experimental_option("excludeSwitches", ['enable-automation'])
+    service = Service('resources\chromedriver\chromedriver.exe')
+    # service.creationFlag = CREATE_NO_WINDOW
+    driver = webdriver.Chrome(service=service, options=options)
     jsonPlayerInfo = getJsonInfoOfPlayer(id=id)
     if jsonPlayerInfo != None:
         dictOfPlayers = {}
@@ -330,7 +336,7 @@ def main():
     # if (input().lower().find("y") != -1):
     #     needGuild = True
     try:
-        getInfoFromSWGOH(id=785425257, needGuild=False)
+        getInfoFromSWGOH(id=785425257, needGuild=True)
     except Exception as ex:
         print(ex)
 

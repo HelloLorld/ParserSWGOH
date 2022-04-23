@@ -72,9 +72,9 @@ def swCall():
 
     # Обработка ошибок
     try:
+        time.sleep(10)
         print('in try')
         myThread2.join(1)
-        time.sleep(2)
         # myThread2.join()
         # ui.show_popup_success()
 
