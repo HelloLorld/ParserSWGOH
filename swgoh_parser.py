@@ -47,9 +47,13 @@ def getInfoAboutGuild(id=''):  # Запрос информации о гильд
 def getInfoAboutAllPlayers(allyCodes=[]):
     dictOfPlayers = {}
     for allyCode in allyCodes:
-        if not allyCode: continue
         dictWithGalacticPowerAndUnits = {}
-        jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode)
+        if not allyCode['ally_code']:
+            dictWithGalacticPowerAndUnits['galactic_power'] = 0
+            dictWithGalacticPowerAndUnits['units'] = None
+            dictOfPlayers[allyCode['name']] = dictWithGalacticPowerAndUnits
+            continue
+        jsonReqPlayer = getJsonInfoOfPlayer(id=allyCode['ally_code'])
         dictWithGalacticPowerAndUnits['galactic_power'] = jsonReqPlayer['data']['galactic_power']
         dictWithGalacticPowerAndUnits['units'] = jsonReqPlayer['units']
         dictOfPlayers[jsonReqPlayer['data']['name']
@@ -207,7 +211,10 @@ def writeDataToSheet(workbook, dictOfPlayers, unitsTuple):
         if (len(player)>maxLengthNickname): maxLengthNickname = len(player)
         worksheet.write(row, col, row,cell_format_style)
         col += 1
-        worksheet.write(row, col, player,cell_format_style)
+        if dictOfPlayers[player]['units']:
+            worksheet.write(row, col, player,cell_format_style)
+        else:
+            worksheet.write(row, col, player,cell_format_pink)
         col += 1
         worksheet.write(row, col, dictOfPlayers[player]['galactic_power'],cell_format_num ) 
         col += 1
@@ -294,7 +301,10 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
             allyCodes = []
             members = getInfoAboutGuild(jsonPlayerInfo['data']['guild_id'])
             for member in members:
-                allyCodes.append(member['ally_code'])
+                player = {}
+                player['ally_code'] = member['ally_code']
+                player['name'] = member['player_name']
+                allyCodes.append(player)
             dictOfPlayers = getInfoAboutAllPlayers(allyCodes=allyCodes)
         else:
             dictWithGalacticPowerAndUnits = {}
@@ -303,8 +313,9 @@ def getInfoFromSWGOH(id=0, needGuild=False, pathForSave=""):  # Основная
             dictOfPlayers[jsonPlayerInfo['data']
                           ['name']] = dictWithGalacticPowerAndUnits
         for key in dictOfPlayers.keys():
-            dictOfPlayers[key]['units'] = arrOfUnitsToDict(
-                dictOfPlayers[key]['units'])
+            if dictOfPlayers[key]['galactic_power']!=0:
+                dictOfPlayers[key]['units'] = arrOfUnitsToDict(
+                    dictOfPlayers[key]['units'])
         print(dictOfPlayers)
         dictOfPlayers = sortDictByGalacticPower(dictPlayers=dictOfPlayers)
         writeDataIntoExcelTable(dictOfPlayers=dictOfPlayers, path=pathForSave)
